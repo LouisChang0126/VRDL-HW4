@@ -4,7 +4,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from utils.dataset_utils import TrainDataset, ValDataset
-from net.model import PromptIR
+from net.model_PromptIR import PromptIR
 from utils.schedulers import LinearWarmupCosineAnnealingLR
 import numpy as np
 import wandb

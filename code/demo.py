@@ -4,7 +4,8 @@ from tqdm import tqdm
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
-from net.model import AdaIR
+from net.model_PromptIR import PromptIR
+from net.model_AdaIR import AdaIR
 from utils.dataset_utils import TestSpecificDataset
 from utils.image_io import save_image_tensor
 import lightning.pytorch as pl

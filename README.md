@@ -18,7 +18,6 @@ Download the [env.yml](env.yml), execute this lines in a computer with conda.
 conda env create -f env.yml -n env
 # after creating env
 conda activate env
-python code/train.py
 ```
 
 ## Performance snapshot
