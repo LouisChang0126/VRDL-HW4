@@ -6,8 +6,6 @@ from torch.utils.data import DataLoader
 from utils.dataset_utils import TrainDataset, ValDataset
 from net.model_AdaIR import AdaIR
 from utils.schedulers import LinearWarmupCosineAnnealingLR
-import numpy as np
-import wandb
 from options import options as opt
 import lightning.pytorch as pl
 from lightning.pytorch.loggers import WandbLogger, TensorBoardLogger
@@ -21,10 +19,10 @@ class AdaIRModel(pl.LightningModule):
         self.net = AdaIR(decoder=True)
         self.loss_fn = nn.L1Loss()
         self.mse_loss = nn.MSELoss()
-    
+
     def forward(self, x):
         return self.net(x)
-    
+
     def training_step(self, batch, batch_idx):
         # training_step defines the train loop.
         ([clean_name, de_id], degrad_patch, clean_patch) = batch
@@ -39,7 +37,7 @@ class AdaIRModel(pl.LightningModule):
             self.log("train_psnr", psnr, prog_bar=True, logger=True)
 
         return loss
-    
+
     def validation_step(self, batch, batch_idx):
         # validation_step defines the validation loop.
         ([clean_name, de_id], degrad_patch, clean_patch) = batch
@@ -53,14 +51,15 @@ class AdaIRModel(pl.LightningModule):
         self.log("val_psnr", psnr, prog_bar=True, logger=True)
 
         return val_loss
-    
+
     def lr_scheduler_step(self, scheduler, metric):
         scheduler.step(self.current_epoch)
-        lr = scheduler.get_lr()
-    
+        # lr = scheduler.get_lr()
+
     def configure_optimizers(self):
         optimizer = optim.AdamW(self.parameters(), lr=self.args.lr)
-        scheduler = LinearWarmupCosineAnnealingLR(optimizer=optimizer, warmup_epochs=15, max_epochs=self.args.epochs)
+        scheduler = LinearWarmupCosineAnnealingLR(
+            optimizer=optimizer, warmup_epochs=15, max_epochs=self.args.epochs)
 
         return [optimizer], [scheduler]
 
@@ -107,9 +106,9 @@ def main():
         drop_last=False,
         num_workers=opt.num_workers
     )
-    
+
     model = AdaIRModel(opt)
-    
+
     trainer = pl.Trainer(
         max_epochs=opt.epochs,
         accelerator="gpu",
@@ -121,7 +120,8 @@ def main():
         val_check_interval=1.0,
         accumulate_grad_batches=1,
     )
-    trainer.fit(model=model, train_dataloaders=trainloader, val_dataloaders=valloader)
+    trainer.fit(model=model,
+                train_dataloaders=trainloader, val_dataloaders=valloader)
 
 
 if __name__ == '__main__':
